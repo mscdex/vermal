@@ -1,0 +1,10 @@
+{ "name": "vermal",
+  "version": "0.0.0",
+  "author": "Brian White <mscdex@mscdex.net>",
+  "description": "A VRML 1.0 parser for node.js",
+  "main": "./parser",
+  "engines": { "node" : ">=0.4.0" },
+  "keywords": [ "vrml", "3d", "parser", "vr", "graphics" ],
+  "licenses": [ { "type": "MIT", "url": "http://github.com/mscdex/vermal/raw/master/LICENSE" } ],
+  "repository" : { "type": "git", "url": "http://github.com/mscdex/vermal.git" }
+}
