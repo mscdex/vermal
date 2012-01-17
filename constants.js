@@ -149,7 +149,7 @@ var ENUMS = {
   partsCone: { SIDES: 1, BOTTOM: 2, ALL: 3 },
   partsCyl: { SIDES: 1, TOP: 2, BOTTOM: 4, ALL: 7 },
   style: { NONE: 0, BOLD: 1, ITALIC: 2 },
-  bool: { TRUE: true, FALSE: false }
+  bool: { 0: false, 1: true, TRUE: true, FALSE: false }
 };
 var FIELD_DEFS = {};
 FIELD_DEFS[TOKENS.AsciiText] = {};
