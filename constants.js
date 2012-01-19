@@ -41,6 +41,8 @@ var TOKENS = {
   SpotLight: C++,
   WWWInline: C++
 };
+for (var T in TOKENS)
+  TOKENS[TOKENS[T]] = T;
 C=0;
 var FIELD_TOKENS = {
   // Types
@@ -61,69 +63,10 @@ var FIELD_TOKENS = {
   SFVec2f: C++,
   MFVec2f: C++,
   SFVec3f: C++,
-  MFVec3f: C++,
-  // Names
-  string: C++,
-  spacing: C++,
-  justification: C++,
-  width: C++,
-  parts: C++,
-  bottomRadius: C++,
-  height: C++,
-  point: C++,
-  depth: C++,
-  radius: C++,
-  on: C++,
-  intensity: C++,
-  color: C++,
-  direction: C++,
-  size: C++,
-  family: C++,
-  style: C++,
-  coordIndex: C++,
-  materialIndex: C++,
-  normalIndex: C++,
-  textureCoordIndex: C++,
-  range: C++,
-  center: C++,
-  ambientColor: C++,
-  diffuseColor: C++,
-  specularColor: C++,
-  emissiveColor: C++,
-  shininess: C++,
-  transparency: C++,
-  value: C++,
-  matrix: C++,
-  vector: C++,
-  position: C++,
-  orientation: C++,
-  focalDistance: C++,
-  heightAngle: C++,
-  location: C++,
-  startIndex: C++,
-  numPoints: C++,
-  rotation: C++,
-  scaleFactor: C++,
-  renderCulling: C++,
-  vertexOrdering: C++,
-  shapeType: C++,
-  faceType: C++,
-  creaseAngle: C++,
-  dropOffRate: C++,
-  cutOffAngle: C++,
-  whichChild: C++,
-  filename: C++,
-  image: C++,
-  wrapS: C++,
-  wrapT: C++,
-  translation: C++,
-  scaleOrientation: C++,
-  name: C++,
-  description: C++,
-  map: C++,
-  bboxSize: C++,
-  bboxCenter: C++
+  MFVec3f: C++
 };
+for (var T in FIELD_TOKENS)
+  FIELD_TOKENS[FIELD_TOKENS[T]] = T;
 C=0;
 var ENUMS = {
   justification: { LEFT: C++, CENTER: C++, RIGHT: C++ },
@@ -151,134 +94,169 @@ var ENUMS = {
   style: { NONE: 0, BOLD: 1, ITALIC: 2 },
   bool: { 0: false, 1: true, TRUE: true, FALSE: false }
 };
-var FIELD_DEFS = {};
-FIELD_DEFS[TOKENS.AsciiText] = {};
-FIELD_DEFS[TOKENS.AsciiText][FIELD_TOKENS.string] = [FIELD_TOKENS.MFString, ''];
-FIELD_DEFS[TOKENS.AsciiText][FIELD_TOKENS.spacing] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.AsciiText][FIELD_TOKENS.justification] = [FIELD_TOKENS.SFEnum, ENUMS.justification.LEFT];
-FIELD_DEFS[TOKENS.AsciiText][FIELD_TOKENS.width] = [FIELD_TOKENS.MFFloat, 0];
-FIELD_DEFS[TOKENS.Cone] = {};
-FIELD_DEFS[TOKENS.Cone][FIELD_TOKENS.parts] = [FIELD_TOKENS.SFBitMask, ENUMS.partsCone.ALL];
-FIELD_DEFS[TOKENS.Cone][FIELD_TOKENS.bottomRadius] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.Cone][FIELD_TOKENS.height] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.Coordinate3] = {};
-FIELD_DEFS[TOKENS.Coordinate3][FIELD_TOKENS.point] = [FIELD_TOKENS.MFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Cube] = {};
-FIELD_DEFS[TOKENS.Cube][FIELD_TOKENS.width] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.Cube][FIELD_TOKENS.height] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.Cube][FIELD_TOKENS.depth] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.Cylinder] = {};
-FIELD_DEFS[TOKENS.Cylinder][FIELD_TOKENS.parts] = [FIELD_TOKENS.SFBitMask, ENUMS.partsCyl.ALL];
-FIELD_DEFS[TOKENS.Cylinder][FIELD_TOKENS.radius] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.Cylinder][FIELD_TOKENS.height] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.DirectionalLight] = {};
-FIELD_DEFS[TOKENS.DirectionalLight][FIELD_TOKENS.on] = [FIELD_TOKENS.SFBool, ENUMS.bool.TRUE];
-FIELD_DEFS[TOKENS.DirectionalLight][FIELD_TOKENS.intensity] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.DirectionalLight][FIELD_TOKENS.color] = [FIELD_TOKENS.SFColor, [1, 1, 1]];
-FIELD_DEFS[TOKENS.DirectionalLight][FIELD_TOKENS.direction] = [FIELD_TOKENS.SFVec3f, [0, 0, -1]];
-FIELD_DEFS[TOKENS.FontStyle] = {};
-FIELD_DEFS[TOKENS.FontStyle][FIELD_TOKENS.size] = [FIELD_TOKENS.SFFloat, 10];
-FIELD_DEFS[TOKENS.FontStyle][FIELD_TOKENS.family] = [FIELD_TOKENS.SFEnum, ENUMS.family.SERIF];
-FIELD_DEFS[TOKENS.FontStyle][FIELD_TOKENS.style] = [FIELD_TOKENS.SFBitMask, ENUMS.style.NONE];
-FIELD_DEFS[TOKENS.IndexedFaceSet] = {};
-FIELD_DEFS[TOKENS.IndexedFaceSet][FIELD_TOKENS.coordIndex] = [FIELD_TOKENS.MFLong, [0]];
-FIELD_DEFS[TOKENS.IndexedFaceSet][FIELD_TOKENS.materialIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.IndexedFaceSet][FIELD_TOKENS.normalIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.IndexedFaceSet][FIELD_TOKENS.textureCoordIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.IndexedLineSet] = {};
-FIELD_DEFS[TOKENS.IndexedLineSet][FIELD_TOKENS.coordIndex] = [FIELD_TOKENS.MFLong, [0]];
-FIELD_DEFS[TOKENS.IndexedLineSet][FIELD_TOKENS.materialIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.IndexedLineSet][FIELD_TOKENS.normalIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.IndexedLineSet][FIELD_TOKENS.textureCoordIndex] = [FIELD_TOKENS.MFLong, [-1]];
-FIELD_DEFS[TOKENS.Info] = {};
-FIELD_DEFS[TOKENS.Info][FIELD_TOKENS.string] = [FIELD_TOKENS.SFString, '<Undefined info>'];
-FIELD_DEFS[TOKENS.LOD] = {};
-FIELD_DEFS[TOKENS.LOD][FIELD_TOKENS.range] = [FIELD_TOKENS.MFFloat, []];
-FIELD_DEFS[TOKENS.LOD][FIELD_TOKENS.center] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Material] = {};
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.ambientColor] = [FIELD_TOKENS.MFColor, [0.2, 0.2, 0.2]];
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.diffuseColor] = [FIELD_TOKENS.MFColor, [0.8, 0.8, 0.8]];
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.specularColor] = [FIELD_TOKENS.MFColor, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.emissiveColor] = [FIELD_TOKENS.MFColor, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.shininess] = [FIELD_TOKENS.MFFloat, [0.2]];
-FIELD_DEFS[TOKENS.Material][FIELD_TOKENS.transparency] = [FIELD_TOKENS.MFFloat, [0]];
-FIELD_DEFS[TOKENS.MaterialBinding] = {};
-FIELD_DEFS[TOKENS.MaterialBinding][FIELD_TOKENS.value] = [FIELD_TOKENS.SFEnum, ENUMS.value.OVERALL];
-FIELD_DEFS[TOKENS.MatrixTransform] = {};
-FIELD_DEFS[TOKENS.MatrixTransform][FIELD_TOKENS.matrix] = [FIELD_TOKENS.SFMatrix, [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]];
-FIELD_DEFS[TOKENS.Normal] = {};
-FIELD_DEFS[TOKENS.Normal][FIELD_TOKENS.vector] = [FIELD_TOKENS.MFVec3f, []];
-FIELD_DEFS[TOKENS.NormalBinding] = {};
-FIELD_DEFS[TOKENS.NormalBinding][FIELD_TOKENS.value] = [FIELD_TOKENS.SFEnum, ENUMS.value.DEFAULT];
-FIELD_DEFS[TOKENS.OrthographicCamera] = {};
-FIELD_DEFS[TOKENS.OrthographicCamera][FIELD_TOKENS.position] = [FIELD_TOKENS.SFVec3f, [0, 0, 1]];
-FIELD_DEFS[TOKENS.OrthographicCamera][FIELD_TOKENS.orientation] = [FIELD_TOKENS.SFRotation, [0, 0, 1, 0]];
-FIELD_DEFS[TOKENS.OrthographicCamera][FIELD_TOKENS.focalDistance] = [FIELD_TOKENS.SFFloat, 5];
-FIELD_DEFS[TOKENS.OrthographicCamera][FIELD_TOKENS.height] = [FIELD_TOKENS.SFFloat, 2];
-FIELD_DEFS[TOKENS.PerspectiveCamera] = {};
-FIELD_DEFS[TOKENS.PerspectiveCamera][FIELD_TOKENS.position] = [FIELD_TOKENS.SFVec3f, [0, 0, 1]];
-FIELD_DEFS[TOKENS.PerspectiveCamera][FIELD_TOKENS.orientation] = [FIELD_TOKENS.SFRotation, [0, 0, 1, 0]];
-FIELD_DEFS[TOKENS.PerspectiveCamera][FIELD_TOKENS.focalDistance] = [FIELD_TOKENS.SFFloat, 5];
-FIELD_DEFS[TOKENS.PerspectiveCamera][FIELD_TOKENS.heightAngle] = [FIELD_TOKENS.SFFloat, 0.785398];
-FIELD_DEFS[TOKENS.PointLight] = {};
-FIELD_DEFS[TOKENS.PointLight][FIELD_TOKENS.on] = [FIELD_TOKENS.SFBool, ENUMS.bool.TRUE];
-FIELD_DEFS[TOKENS.PointLight][FIELD_TOKENS.intensity] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.PointLight][FIELD_TOKENS.color] = [FIELD_TOKENS.SFColor, [1, 1, 1]];
-FIELD_DEFS[TOKENS.PointLight][FIELD_TOKENS.location] = [FIELD_TOKENS.SFVec3f, [0, 0, 1]];
-FIELD_DEFS[TOKENS.PointSet] = {};
-FIELD_DEFS[TOKENS.PointSet][FIELD_TOKENS.startIndex] = [FIELD_TOKENS.SFLong, 0];
-FIELD_DEFS[TOKENS.PointSet][FIELD_TOKENS.numPoints] = [FIELD_TOKENS.SFLong, -1];
-FIELD_DEFS[TOKENS.Rotation] = {};
-FIELD_DEFS[TOKENS.Rotation][FIELD_TOKENS.rotation] = [FIELD_TOKENS.SFRotation, [0, 0, 1, 0]];
-FIELD_DEFS[TOKENS.Scale] = {};
-FIELD_DEFS[TOKENS.Scale][FIELD_TOKENS.scaleFactor] = [FIELD_TOKENS.SFVec3f, [1, 1, 1]];
-FIELD_DEFS[TOKENS.Separator] = {};
-FIELD_DEFS[TOKENS.Separator][FIELD_TOKENS.renderCulling] = [FIELD_TOKENS.SFEnum, ENUMS.renderCulling.AUTO];
-FIELD_DEFS[TOKENS.ShapeHints] = {};
-FIELD_DEFS[TOKENS.ShapeHints][FIELD_TOKENS.vertexOrdering] = [FIELD_TOKENS.SFEnum, ENUMS.vertexOrdering.UNKNOWN_ORDERING];
-FIELD_DEFS[TOKENS.ShapeHints][FIELD_TOKENS.shapeType] = [FIELD_TOKENS.SFEnum, ENUMS.shapeType.UNKNOWN_SHAPE_TYPE];
-FIELD_DEFS[TOKENS.ShapeHints][FIELD_TOKENS.faceType] = [FIELD_TOKENS.SFEnum, ENUMS.faceType.CONVEX];
-FIELD_DEFS[TOKENS.ShapeHints][FIELD_TOKENS.creaseAngle] = [FIELD_TOKENS.SFFloat, 0.5];
-FIELD_DEFS[TOKENS.Sphere] = {};
-FIELD_DEFS[TOKENS.Sphere][FIELD_TOKENS.radius] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.SpotLight] = {};
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.on] = [FIELD_TOKENS.SFBool, ENUMS.bool.TRUE];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.intensity] = [FIELD_TOKENS.SFFloat, 1];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.color] = [FIELD_TOKENS.SFVec3f, [1, 1, 1]];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.location] = [FIELD_TOKENS.SFVec3f, [0, 0, 1]];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.direction] = [FIELD_TOKENS.SFVec3f, [0, 0, -1]];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.dropOffRate] = [FIELD_TOKENS.SFFloat, 0];
-FIELD_DEFS[TOKENS.SpotLight][FIELD_TOKENS.cutOffAngle] = [FIELD_TOKENS.SFFloat, 0.785398];
-FIELD_DEFS[TOKENS.Switch] = {};
-FIELD_DEFS[TOKENS.Switch][FIELD_TOKENS.whichChild] = [FIELD_TOKENS.SFLong, -1];
-FIELD_DEFS[TOKENS.Texture2] = {};
-FIELD_DEFS[TOKENS.Texture2][FIELD_TOKENS.filename] = [FIELD_TOKENS.SFString, ''];
-FIELD_DEFS[TOKENS.Texture2][FIELD_TOKENS.image] = [FIELD_TOKENS.SFImage, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Texture2][FIELD_TOKENS.wrapS] = [FIELD_TOKENS.SFEnum, ENUMS.wrapS.REPEAT];
-FIELD_DEFS[TOKENS.Texture2][FIELD_TOKENS.wrapT] = [FIELD_TOKENS.SFEnum, ENUMS.wrapT.REPEAT];
-FIELD_DEFS[TOKENS.Texture2Transform] = {};
-FIELD_DEFS[TOKENS.Texture2Transform][FIELD_TOKENS.translation] = [FIELD_TOKENS.SFVec2f, [0, 0]];
-FIELD_DEFS[TOKENS.Texture2Transform][FIELD_TOKENS.rotation] = [FIELD_TOKENS.SFFloat, 0];
-FIELD_DEFS[TOKENS.Texture2Transform][FIELD_TOKENS.scaleFactor] = [FIELD_TOKENS.SFVec2f, [1, 1]];
-FIELD_DEFS[TOKENS.Texture2Transform][FIELD_TOKENS.center] = [FIELD_TOKENS.SFVec2f, [0, 0]];
-FIELD_DEFS[TOKENS.TextureCoordinate2] = {};
-FIELD_DEFS[TOKENS.TextureCoordinate2][FIELD_TOKENS.point] = [FIELD_TOKENS.MFVec2f, [0, 0]];
-FIELD_DEFS[TOKENS.Transform] = {};
-FIELD_DEFS[TOKENS.Transform][FIELD_TOKENS.translation] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Transform][FIELD_TOKENS.rotation] = [FIELD_TOKENS.SFRotation, [0, 0, 1, 0]];
-FIELD_DEFS[TOKENS.Transform][FIELD_TOKENS.scaleFactor] = [FIELD_TOKENS.SFVec3f, [1, 1, 1]];
-FIELD_DEFS[TOKENS.Transform][FIELD_TOKENS.scaleOrientation] = [FIELD_TOKENS.SFRotation, [0, 0, 1, 0]];
-FIELD_DEFS[TOKENS.Transform][FIELD_TOKENS.center] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.Translation] = {};
-FIELD_DEFS[TOKENS.Translation][FIELD_TOKENS.translation] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.WWWAnchor] = {};
-FIELD_DEFS[TOKENS.WWWAnchor][FIELD_TOKENS.name] = [FIELD_TOKENS.SFString, ''];
-FIELD_DEFS[TOKENS.WWWAnchor][FIELD_TOKENS.description] = [FIELD_TOKENS.SFString, ''];
-FIELD_DEFS[TOKENS.WWWAnchor][FIELD_TOKENS.map] = [FIELD_TOKENS.SFEnum, ENUMS.map.NONE];
-FIELD_DEFS[TOKENS.WWWInline] = {};
-FIELD_DEFS[TOKENS.WWWInline][FIELD_TOKENS.name] = [FIELD_TOKENS.SFString, ''];
-FIELD_DEFS[TOKENS.WWWInline][FIELD_TOKENS.bboxSize] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
-FIELD_DEFS[TOKENS.WWWInline][FIELD_TOKENS.bboxCenter] = [FIELD_TOKENS.SFVec3f, [0, 0, 0]];
+var FIELD_DEFS = {
+  AsciiText: {
+    string: { type: FIELD_TOKENS.MFString, default: '' },
+    spacing: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    justification: { type: FIELD_TOKENS.SFEnum, default: ENUMS.justification.LEFT },
+    width: { type: FIELD_TOKENS.MFFloat, default: 0 }
+  },
+  Cone: {
+    parts: { type: FIELD_TOKENS.SFBitMask, default: ENUMS.partsCone.ALL },
+    bottomRadius: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    height: { type: FIELD_TOKENS.SFFloat, default: 2 }
+  },
+  Coordinate3: {
+    point: { type: FIELD_TOKENS.MFVec3f, default: [0, 0, 0] }
+  },
+  Cube: {
+    width: { type: FIELD_TOKENS.SFFloat, default: 2 },
+    height: { type: FIELD_TOKENS.SFFloat, default: 2 },
+    depth: { type: FIELD_TOKENS.SFFloat, default: 2 }
+  },
+  Cylinder: {
+    parts: { type: FIELD_TOKENS.SFBitMask, default: ENUMS.partsCyl.ALL },
+    radius: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    height: { type: FIELD_TOKENS.SFFloat, default: 2 }
+  },
+  DirectionalLight: {
+    on: { type: FIELD_TOKENS.SFBool, default: ENUMS.bool.TRUE },
+    intensity: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    color: { type: FIELD_TOKENS.SFColor, default: [1, 1, 1] },
+    direction: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, -1] }
+  },
+  FontStyle: {
+    size: { type: FIELD_TOKENS.SFFloat, default: 10 },
+    family: { type: FIELD_TOKENS.SFEnum, default: ENUMS.family.SERIF },
+    style: { type: FIELD_TOKENS.SFBitMask, default: ENUMS.style.NONE }
+  },
+  IndexedFaceSet: {
+    coordIndex: { type: FIELD_TOKENS.MFLong, default: [0] },
+    materialIndex: { type: FIELD_TOKENS.MFLong, default: [-1] },
+    normalIndex: { type: FIELD_TOKENS.MFLong, default: [-1] },
+    textureCoordIndex: { type: FIELD_TOKENS.MFLong, default: [-1] }
+  },
+  IndexedLineSet: {
+    coordIndex: { type: FIELD_TOKENS.MFLong, default: [0] },
+    materialIndex: { type: FIELD_TOKENS.MFLong, default: [-1] },
+    normalIndex: { type: FIELD_TOKENS.MFLong, default: [-1] },
+    textureCoordIndex: { type: FIELD_TOKENS.MFLong, default: [-1] }
+  },
+  Info: {
+    string: { type: FIELD_TOKENS.SFString, default: '<Undefined info>' }
+  },
+  LOD: {
+    range: { type: FIELD_TOKENS.MFFloat, default: [] },
+    center: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] }
+  },
+  Material: {
+    ambientColor: { type: FIELD_TOKENS.MFColor, default: [0.2, 0.2, 0.2] },
+    diffuseColor: { type: FIELD_TOKENS.MFColor, default: [0.8, 0.8, 0.8] },
+    specularColor: { type: FIELD_TOKENS.MFColor, default: [0, 0, 0] },
+    emissiveColor: { type: FIELD_TOKENS.MFColor, default: [0, 0, 0] },
+    shininess: { type: FIELD_TOKENS.MFFloat, default: [0.2] },
+    transparency: { type: FIELD_TOKENS.MFFloat, default: [0] }
+  },
+  MaterialBinding: {
+    value: { type: FIELD_TOKENS.SFEnum, default: ENUMS.value.OVERALL }
+  },
+  MatrixTransform: {
+    matrix: { type: FIELD_TOKENS.SFMatrix, default: [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]] }
+  },
+  Normal: {
+    vector: { type: FIELD_TOKENS.MFVec3f, default: [] }
+  },
+  NormalBinding: {
+    value: { type: FIELD_TOKENS.SFEnum, default: ENUMS.value.DEFAULT }
+  },
+  OrthographicCamera: {
+    position: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 1] },
+    orientation: { type: FIELD_TOKENS.SFRotation, default: [0, 0, 1, 0] },
+    focalDistance: { type: FIELD_TOKENS.SFFloat, default: 5 },
+    height: { type: FIELD_TOKENS.SFFloat, default: 2 }
+  },
+  PerspectiveCamera: {
+    position: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 1] },
+    orientation: { type: FIELD_TOKENS.SFRotation, default: [0, 0, 1, 0] },
+    focalDistance: { type: FIELD_TOKENS.SFFloat, default: 5 },
+    heightAngle: { type: FIELD_TOKENS.SFFloat, default: 0.785398 }
+  },
+  PointLight: {
+    on: { type: FIELD_TOKENS.SFBool, default: ENUMS.bool.TRUE },
+    intensity: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    color: { type: FIELD_TOKENS.SFColor, default: [1, 1, 1] },
+    location: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 1] }
+  },
+  PointSet: {
+    startIndex: { type: FIELD_TOKENS.SFLong, default: 0 },
+    numPoints: { type: FIELD_TOKENS.SFLong, default: -1 }
+  },
+  Rotation: {
+    rotation: { type: FIELD_TOKENS.SFRotation, default: [0, 0, 1, 0] }
+  },
+  Scale: {
+    scaleFactor: { type: FIELD_TOKENS.SFVec3f, default: [1, 1, 1] }
+  },
+  Separator: {
+    renderCulling: { type: FIELD_TOKENS.SFEnum, default: ENUMS.renderCulling.AUTO }
+  },
+  ShapeHints: {
+    vertexOrdering: { type: FIELD_TOKENS.SFEnum, default: ENUMS.vertexOrdering.UNKNOWN_ORDERING },
+    shapeType: { type: FIELD_TOKENS.SFEnum, default: ENUMS.shapeType.UNKNOWN_SHAPE_TYPE },
+    faceType: { type: FIELD_TOKENS.SFEnum, default: ENUMS.faceType.CONVEX },
+    creaseAngle: { type: FIELD_TOKENS.SFFloat, default: 0.5 }
+  },
+  Sphere: {
+    radius: { type: FIELD_TOKENS.SFFloat, default: 1 }
+  },
+  SpotLight: {
+    on: { type: FIELD_TOKENS.SFBool, default: ENUMS.bool.TRUE },
+    intensity: { type: FIELD_TOKENS.SFFloat, default: 1 },
+    color: { type: FIELD_TOKENS.SFVec3f, default: [1, 1, 1] },
+    location: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 1] },
+    direction: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, -1] },
+    dropOffRate: { type: FIELD_TOKENS.SFFloat, default: 0 },
+    cutOffAngle: { type: FIELD_TOKENS.SFFloat, default: 0.785398 }
+  },
+  Switch: {
+    whichChild: { type: FIELD_TOKENS.SFLong, default: -1 }
+  },
+  Texture2: {
+    filename: { type: FIELD_TOKENS.SFString, default: '' },
+    image: { type: FIELD_TOKENS.SFImage, default: [0, 0, 0] },
+    wrapS: { type: FIELD_TOKENS.SFEnum, default: ENUMS.wrapS.REPEAT },
+    wrapT: { type: FIELD_TOKENS.SFEnum, default: ENUMS.wrapT.REPEAT }
+  },
+  Texture2Transform: {
+    translation: { type: FIELD_TOKENS.SFVec2f, default: [0, 0] },
+    rotation: { type: FIELD_TOKENS.SFFloat, default: 0 },
+    scaleFactor: { type: FIELD_TOKENS.SFVec2f, default: [1, 1] },
+    center: { type: FIELD_TOKENS.SFVec2f, default: [0, 0] }
+  },
+  TextureCoordinate2: {
+    point: { type: FIELD_TOKENS.MFVec2f, default: [0, 0] }
+  },
+  Transform: {
+    translation: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] },
+    rotation: { type: FIELD_TOKENS.SFRotation, default: [0, 0, 1, 0] },
+    scaleFactor: { type: FIELD_TOKENS.SFVec3f, default: [1, 1, 1] },
+    scaleOrientation: { type: FIELD_TOKENS.SFRotation, default: [0, 0, 1, 0] },
+    center: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] }
+  },
+  Translation: {
+    translation: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] }
+  },
+  WWWAnchor: {
+    name: { type: FIELD_TOKENS.SFString, default: '' },
+    description: { type: FIELD_TOKENS.SFString, default: '' },
+    map: { type: FIELD_TOKENS.SFEnum, default: ENUMS.map.NONE }
+  },
+  WWWInline: {
+    name: { type: FIELD_TOKENS.SFString, default: '' },
+    bboxSize: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] },
+    bboxCenter: { type: FIELD_TOKENS.SFVec3f, default: [0, 0, 0] }
+  }
+};
 
 exports.TOKENS = TOKENS;
 exports.FIELD_TOKENS = FIELD_TOKENS;
