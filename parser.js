@@ -19,7 +19,10 @@ var OPEN_BRACE = 123,
     OPEN_BRACKET = 91,
     CLOSE_BRACKET = 93,
     DBL_QUOTE = 34,
-    COMMA = 44;
+    COMMA = 44,
+    OPEN_PARENS = 40,
+    CLOSE_PARENS = 41,
+    PIPE = 124;
 
 var C = 0,
     STATE = {
@@ -35,9 +38,8 @@ var C = 0,
       READ_VAL: C++
     },
     TOKENS = consts.TOKENS,
-    FIELD_TOKENS = consts.FIELD_TOKENS,
-    ENUMS = consts.ENUMS,
-    FIELD_DEFS = consts.FIELD_DEFS;
+    FIELD_TYPES = consts.FIELD_TYPES,
+    FIELDS = consts.FIELDS;
 
 var EOB = -1, // end of buffer indicator
     EOF = -2,
@@ -45,24 +47,22 @@ var EOB = -1, // end of buffer indicator
     HEADER = [35, 86, 82, 77, 76, 32, 86, 49, 46, 48, 32, 97, 115, 99, 105, 105],
     HEADER_LEN = HEADER.length;
 
-var FIELD_TOKEN_MATCHABLES = {};
-Object.keys(FIELD_TOKENS).forEach(function(v) {
-  var a = new Array(len), o = FIELD_TOKEN_MATCHABLES;
-  for (var i=0,len=v.length,chr; i<len; ++i) {
-    chr = v.charCodeAt(i);
-    if (!o[chr])
-      o[chr] = {};
-    o = o[chr];
-  }
-  o.val = FIELD_TOKENS[v];
-});
-
 // Begin Parser class ==========================================================
 
 function Parser() {
   this._reset();
 }
 inherits(Parser, EventEmitter);
+
+Parser.prototype.addCustomNode = function(o) {
+  if (TOKENS[o.name] === undefined) {
+    var val = ++consts.maxTokenVal;
+    TOKENS[o.name] = val;
+    TOKENS[val] = o.name;
+    if (o.fields)
+      FIELDS[o.name] = o.fields;
+  }
+};
 
 Parser.prototype.push = function(data) {
   var c;
@@ -188,33 +188,42 @@ Parser.prototype._bodyParse = function(c) {
       this._throwError('Unexpected end of body node');
     else if (c === OPEN_BRACE) {
       // oops, this was actually a child node!
-      this._backbuf = this._buffer;
-      this._backbuf += String.fromCharCode(OPEN_BRACE);
+      this._appendBackbuf(this._buffer);
+      this._appendBackbuf(OPEN_BRACE);
       this._state = STATE.READY;
       this._nodestate = {};
+      this._ptr = 0;
       this._nodedone = false;
       this._nodestarted = true;
       this._nodetype = undefined;
       this._buffer = undefined;
       return;
-    } else if (isWhitespace(c)) {
+    } else if (isWhitespace(c) || c === DBL_QUOTE) {
       if (this._buffer !== undefined) {
         if (this._buffer[0] === this._buffer[0].toLowerCase()) {
+          if (TOKENS[this._nodetype] === undefined && this._nodestate.fields === undefined && this._buffer !== 'fields')
+            this._throwError('Unknown node type \'' + this._nodetype + '\' without fields defintition');
+          if ((TOKENS[this._nodetype] !== undefined && FIELDS[this._nodetype][this._buffer] === undefined) && (this._nodestate.fields !== undefined && this._nodestate.fields[this._buffer] === undefined))
+            this._throwError('Unknown field type \'' + this._buffer + '\' for node type \'' + this._nodetype + '\'');
           this._nodestate.key = this._buffer;
           this._buffer = undefined;
           this._nodestate.state = BODYSTATE.READ_VAL;
+          if (c === DBL_QUOTE)
+            this._appendBackbuf(c);
         } else {
           // must be something like DEF ... or USE ... or NodeName ...
-          this._backbuf = this._buffer;
-          this._backbuf += String.fromCharCode(c);
+          this._appendBackbuf(this._buffer);
+          this._appendBackbuf(c);
           this._state = STATE.READY;
           this._nodestate = {};
+          this._ptr = 0;
           this._nodedone = false;
           this._nodestarted = true;
           this._nodetype = undefined;
           this._buffer = undefined;
         }
-      }
+      } else if (c === DBL_QUOTE)
+        this._throwError('Unexpected double quote');
       return;
     }
   } else if (this._nodestate.state === BODYSTATE.READ_VAL) {
@@ -232,8 +241,19 @@ Parser.prototype._bodyParse = function(c) {
       if (!this._instr) {
         // multi-value field value
         if (this._buffer !== undefined)
-          this._nodestate.val.push(this._buffer);
-        this.emit('field', this._nodestate.key, this._nodestate.val);
+          this._nodestate.val.push(this._buffer.trim());
+        if (this._nodestate.key === 'fields') {
+          var vals = this._nodestate.val;
+          this._nodestate.fields = {};
+          for (var i=0,len=vals.length,tokens; i<len; ++i) {
+            tokens = vals[i].trim().split(' ');
+            if (FIELD_TYPES[tokens[0]] === undefined)
+              this._throwError('Unidentified field type \'' + tokens[0] + '\'');
+            this._nodestate.fields[tokens[1]] = { type: FIELD_TYPES[tokens[0]] };
+          }
+        } else
+          this.emit('field', this._nodestate.key, this._nodestate.val);
+        this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
         this._nodestate.state = BODYSTATE.IDLE;
@@ -244,13 +264,37 @@ Parser.prototype._bodyParse = function(c) {
       }
     } else if (c === EOF || (c === CLOSE_BRACE && !this._instr)) {
       if (c === CLOSE_BRACE && this._nodestate.val === undefined && this._buffer !== undefined) {
+        var field = FIELDS[this._nodetype][this._nodestate.key], done = false;
+        if (field === undefined)
+          field = this._nodestate.fields;
+        if (field.type === FIELD_TYPES.SFColor || field.type === FIELD_TYPES.SFVec3f) {
+          if (++this._ptr === 3)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFVec2f) {
+          if (++this._ptr === 2)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFRotation) {
+          if (++this._ptr === 4)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFMatrix) {
+          if (++this._ptr === 16)
+            done = true;
+        } else if (FIELD_TYPES[field.type].substr(0, 2) === 'MF') {
+          done = true;
+          this._buffer = [this._buffer.trim()];
+        } else
+          done = true;
+        if (!done)
+          this._throwError('Unexpected end of field');
         this.emit('field', this._nodestate.key, this._buffer);
+        this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
         this._nodestate.state = BODYSTATE.IDLE;
+        this._nodestate.fields = undefined;
         this._nodestate.wasQuoted = false;
         this._nodedone = true;
-        this._backbuf = String.fromCharCode(c);
+        this._appendBackbuf(c);
         return;
       }
       if (this._nodestate.key !== undefined &&
@@ -279,6 +323,7 @@ Parser.prototype._bodyParse = function(c) {
           } else {
             // single quoted field value
             this.emit('field', this._nodestate.key, this._buffer);
+            this._ptr = 0;
             this._nodestate.key = this._nodestate.val = undefined;
             this._nodestate.state = BODYSTATE.IDLE;
             this._nodedone = true;
@@ -293,17 +338,41 @@ Parser.prototype._bodyParse = function(c) {
       else {
         this._nodestate.val.push(this._buffer);
         this._buffer = undefined;
+        this._ptr = 0;
       }
       return;
     } else if (isWhitespace(c) && !this._instr) {
       if (!Array.isArray(this._nodestate.val)) {
-        this.emit('field', this._nodestate.key, this._buffer);
-        this._buffer = undefined;
-        this._nodestate.wasQuoted = false;
-        this._nodestate.key = this._nodestate.val = undefined;
-        this._nodestate.state = BODYSTATE.IDLE;
-        this._nodedone = true;
-        return;
+        var field = FIELDS[this._nodetype][this._nodestate.key], done = false;
+        if (field === undefined)
+          field = this._nodestate.fields;
+        if (field.type === FIELD_TYPES.SFColor || field.type === FIELD_TYPES.SFVec3f) {
+          if (++this._ptr === 3)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFVec2f) {
+          if (++this._ptr === 2)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFRotation) {
+          if (++this._ptr === 4)
+            done = true;
+        } else if (field.type === FIELD_TYPES.SFMatrix) {
+          if (++this._ptr === 16)
+            done = true;
+        } else if (FIELD_TYPES[field.type].substr(0, 2) === 'MF') {
+          done = true;
+          this._buffer = [this._buffer];
+        } else
+          done = true;
+        if (done) {
+          this.emit('field', this._nodestate.key, this._buffer);
+          this._ptr = 0;
+          this._buffer = undefined;
+          this._nodestate.wasQuoted = false;
+          this._nodestate.key = this._nodestate.val = undefined;
+          this._nodestate.state = BODYSTATE.IDLE;
+          this._nodedone = true;
+          return;
+        }
       }
     }
   } else {
@@ -311,7 +380,7 @@ Parser.prototype._bodyParse = function(c) {
 //console.error('node state === IDLE');
     if (!isWhitespace(c) && c !== EOF && c !== CLOSE_BRACE) {
       this._nodedone = false;
-      this._backbuf = String.fromCharCode(c);
+      this._appendBackbuf(c);
       this._nodestate.state = BODYSTATE.READ_KEY;
     } else if (c === CLOSE_BRACE) {
       if (this._nodedone || this._nodestarted) {
@@ -332,6 +401,13 @@ Parser.prototype._bodyParse = function(c) {
     this._buffer = String.fromCharCode(c);
   else
     this._buffer += String.fromCharCode(c);
+};
+
+Parser.prototype._appendBackbuf = function(v) {
+  if (this._backbuf === undefined)
+    this._backbuf = (typeof v === 'number' ? String.fromCharCode(v) : v);
+  else
+    this._backbuf += (typeof v === 'number' ? String.fromCharCode(v) : v);
 };
 
 Parser.prototype._getc = function(data) {
@@ -359,7 +435,6 @@ Parser.prototype._getc = function(data) {
       }
     }
   }
-//console.error('_getc() returned: ' + inspect(String.fromCharCode(c)) + ' (' + c + ')');
   return c;
 };
 
