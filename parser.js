@@ -230,14 +230,14 @@ Parser.prototype._bodyParse = function(c) {
 //console.error('node state === READ_VAL');
     if (isWhitespace(c) && this._buffer === undefined)
       return;
-    else if (c === OPEN_BRACKET) {
+    else if (c === OPEN_BRACKET || c === OPEN_PARENS) {
       if (!this._instr && Array.isArray(this._nodestate.val))
-        this._throwError('Unexpected open bracket');
+        this._throwError('Unexpected open ' + (c === OPEN_BRACKET ? 'bracket' : 'parenthesis'));
       else if (!this._instr && this._nodestate.val === undefined) {
         this._nodestate.val = [];
         return;
       }
-    } else if (c === CLOSE_BRACKET) {
+    } else if (c === CLOSE_BRACKET || c === CLOSE_PARENS) {
       if (!this._instr) {
         // multi-value field value
         if (this._buffer !== undefined)
@@ -264,9 +264,7 @@ Parser.prototype._bodyParse = function(c) {
       }
     } else if (c === EOF || (c === CLOSE_BRACE && !this._instr)) {
       if (c === CLOSE_BRACE && this._nodestate.val === undefined && this._buffer !== undefined) {
-        var field = FIELDS[this._nodetype][this._nodestate.key], done = false;
-        if (field === undefined)
-          field = this._nodestate.fields;
+        var field = this._getField(), done = false;
         if (field.type === FIELD_TYPES.SFColor || field.type === FIELD_TYPES.SFVec3f) {
           if (++this._ptr === 3)
             done = true;
@@ -332,20 +330,20 @@ Parser.prototype._bodyParse = function(c) {
           return;
         }
       }
-    } else if (c === COMMA && Array.isArray(this._nodestate.val)) {
+    } else if (((c === COMMA && FIELD_TYPES[this._getField().type].substr(0,2) === 'MF') ||
+                (c === PIPE && this._getField().type === FIELD_TYPES.SFBitMask)
+               ) && Array.isArray(this._nodestate.val)) {
       if (this._nodestate.wasQuoted)
         this._nodestate.wasQuoted = false;
       else {
-        this._nodestate.val.push(this._buffer);
+        this._nodestate.val.push(this._buffer.trim());
         this._buffer = undefined;
         this._ptr = 0;
       }
       return;
     } else if (isWhitespace(c) && !this._instr) {
       if (!Array.isArray(this._nodestate.val)) {
-        var field = FIELDS[this._nodetype][this._nodestate.key], done = false;
-        if (field === undefined)
-          field = this._nodestate.fields;
+        var field = this._getField(), done = false;
         if (field.type === FIELD_TYPES.SFColor || field.type === FIELD_TYPES.SFVec3f) {
           if (++this._ptr === 3)
             done = true;
@@ -401,6 +399,15 @@ Parser.prototype._bodyParse = function(c) {
     this._buffer = String.fromCharCode(c);
   else
     this._buffer += String.fromCharCode(c);
+};
+
+Parser.prototype._getField = function() {
+  var field = FIELDS[this._nodetype];
+  if (field !== undefined)
+    field = field[this._nodestate.key];
+  else
+    field = this._nodestate.fields[this._nodestate.key];
+  return field;
 };
 
 Parser.prototype._appendBackbuf = function(v) {
