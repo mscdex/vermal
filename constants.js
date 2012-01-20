@@ -71,10 +71,10 @@ for (var T in FIELD_TYPES)
 C=0;
 var FIELDS = {
   AsciiText: {
-    string: { type: FIELD_TYPES.MFString, default: '' },
+    string: { type: FIELD_TYPES.MFString, default: [''] },
     spacing: { type: FIELD_TYPES.SFFloat, default: 1 },
     justification: { type: FIELD_TYPES.SFEnum, default: 'LEFT', values: ['LEFT', 'CENTER', 'RIGHT'] },
-    width: { type: FIELD_TYPES.MFFloat, default: 0 }
+    width: { type: FIELD_TYPES.MFFloat, default: [0] }
   },
   Cone: {
     parts: { type: FIELD_TYPES.SFBitMask, default: ['ALL'], values: ['SIDES', 'BOTTOM', 'ALL'] },
@@ -82,7 +82,7 @@ var FIELDS = {
     height: { type: FIELD_TYPES.SFFloat, default: 2 }
   },
   Coordinate3: {
-    point: { type: FIELD_TYPES.MFVec3f, default: [0, 0, 0] }
+    point: { type: FIELD_TYPES.MFVec3f, default: [[0, 0, 0]] }
   },
   Cube: {
     width: { type: FIELD_TYPES.SFFloat, default: 2 },
@@ -95,7 +95,7 @@ var FIELDS = {
     height: { type: FIELD_TYPES.SFFloat, default: 2 }
   },
   DirectionalLight: {
-    on: { type: FIELD_TYPES.SFBool, default: 'TRUE', values: ['0', '1', 'TRUE', 'FALSE'] },
+    on: { type: FIELD_TYPES.SFBool, default: true },
     intensity: { type: FIELD_TYPES.SFFloat, default: 1 },
     color: { type: FIELD_TYPES.SFColor, default: [1, 1, 1] },
     direction: { type: FIELD_TYPES.SFVec3f, default: [0, 0, -1] }
@@ -125,10 +125,10 @@ var FIELDS = {
     center: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 0] }
   },
   Material: {
-    ambientColor: { type: FIELD_TYPES.MFColor, default: [0.2, 0.2, 0.2] },
-    diffuseColor: { type: FIELD_TYPES.MFColor, default: [0.8, 0.8, 0.8] },
-    specularColor: { type: FIELD_TYPES.MFColor, default: [0, 0, 0] },
-    emissiveColor: { type: FIELD_TYPES.MFColor, default: [0, 0, 0] },
+    ambientColor: { type: FIELD_TYPES.MFColor, default: [[0.2, 0.2, 0.2]] },
+    diffuseColor: { type: FIELD_TYPES.MFColor, default: [[0.8, 0.8, 0.8]] },
+    specularColor: { type: FIELD_TYPES.MFColor, default: [[0, 0, 0]] },
+    emissiveColor: { type: FIELD_TYPES.MFColor, default: [[0, 0, 0]] },
     shininess: { type: FIELD_TYPES.MFFloat, default: [0.2] },
     transparency: { type: FIELD_TYPES.MFFloat, default: [0] }
   },
@@ -183,7 +183,7 @@ var FIELDS = {
     heightAngle: { type: FIELD_TYPES.SFFloat, default: 0.785398 }
   },
   PointLight: {
-    on: { type: FIELD_TYPES.SFBool, default: 'TRUE', values: ['0', '1', 'TRUE', 'FALSE'] },
+    on: { type: FIELD_TYPES.SFBool, default: true },
     intensity: { type: FIELD_TYPES.SFFloat, default: 1 },
     color: { type: FIELD_TYPES.SFColor, default: [1, 1, 1] },
     location: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 1] }
@@ -211,7 +211,7 @@ var FIELDS = {
     radius: { type: FIELD_TYPES.SFFloat, default: 1 }
   },
   SpotLight: {
-    on: { type: FIELD_TYPES.SFBool, default: 'TRUE', values: ['0', '1', 'TRUE', 'FALSE'] },
+    on: { type: FIELD_TYPES.SFBool, default: true },
     intensity: { type: FIELD_TYPES.SFFloat, default: 1 },
     color: { type: FIELD_TYPES.SFVec3f, default: [1, 1, 1] },
     location: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 1] },
@@ -235,7 +235,7 @@ var FIELDS = {
     center: { type: FIELD_TYPES.SFVec2f, default: [0, 0] }
   },
   TextureCoordinate2: {
-    point: { type: FIELD_TYPES.MFVec2f, default: [0, 0] }
+    point: { type: FIELD_TYPES.MFVec2f, default: [[0, 0]] }
   },
   Transform: {
     translation: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 0] },

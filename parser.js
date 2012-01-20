@@ -252,7 +252,7 @@ Parser.prototype._bodyParse = function(c) {
             this._nodestate.fields[tokens[1]] = { type: FIELD_TYPES[tokens[0]] };
           }
         } else
-          this.emit('field', this._nodestate.key, this._nodestate.val);
+          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._nodestate.val));
         this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
@@ -284,7 +284,7 @@ Parser.prototype._bodyParse = function(c) {
           done = true;
         if (!done)
           this._throwError('Unexpected end of field');
-        this.emit('field', this._nodestate.key, this._buffer);
+        this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
         this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
@@ -320,7 +320,7 @@ Parser.prototype._bodyParse = function(c) {
             this._nodestate.val.push(this._buffer);
           } else {
             // single quoted field value
-            this.emit('field', this._nodestate.key, this._buffer);
+            this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
             this._ptr = 0;
             this._nodestate.key = this._nodestate.val = undefined;
             this._nodestate.state = BODYSTATE.IDLE;
@@ -362,7 +362,7 @@ Parser.prototype._bodyParse = function(c) {
         } else
           done = true;
         if (done) {
-          this.emit('field', this._nodestate.key, this._buffer);
+          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
           this._ptr = 0;
           this._buffer = undefined;
           this._nodestate.wasQuoted = false;
@@ -477,6 +477,65 @@ function isWhitespace(c) {
 
 function isNL(c) {
   return c === 10 || c === 13;
+}
+
+function formatValue(type, val) {
+  switch (type) {
+    case FIELD_TYPES.SFVec2f:
+    case FIELD_TYPES.SFVec3f:
+    case FIELD_TYPES.SFRotation:
+    case FIELD_TYPES.SFColor:
+      return toMultiFloat(val);
+    case FIELD_TYPES.SFLong:
+      return toLong(val);
+    case FIELD_TYPES.SFFloat:
+      return toFloat(val);
+    case FIELD_TYPES.SFMatrix:
+      var vals = val.map(toFloat), ret = new Array(4);
+      for (var i=0; i<4; ++i) {
+        ret[i] = new Array(4);
+        ret[i][0] = vals[i*4];
+        ret[i][1] = vals[(i*4) + 1];
+        ret[i][2] = vals[(i*4) + 2];
+        ret[i][3] = vals[(i*4) + 3];
+      }
+      return ret;
+    case FIELD_TYPES.SFBool:
+      return (val === 'TRUE' || val === '1' ? true : false);
+
+    case FIELD_TYPES.MFFloat:
+      if (!Array.isArray(val))
+        val = [val];
+      return val.map(toFloat);
+    case FIELD_TYPES.MFLong:
+      if (!Array.isArray(val))
+        val = [val];
+      return val.map(toLong);
+    case FIELD_TYPES.MFVec2f:
+    case FIELD_TYPES.MFVec3f:
+    case FIELD_TYPES.MFColor:
+      if (!Array.isArray(val))
+        val = [val];
+      return val.map(toMultiFloat);
+    default:
+      return val;
+  }
+}
+
+function toMultiFloat(v) {
+  return v.split(' ').map(toFloat);
+}
+
+function toMultiLong(v) {
+  return v.split(' ').map(toLong);
+}
+
+function toFloat(v) {
+  return parseFloat(v);
+}
+
+function toLong(v) {
+  return parseInt(v, 10);
 }
 
 module.exports = Parser;
