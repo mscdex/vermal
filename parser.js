@@ -67,13 +67,6 @@ Parser.prototype.addCustomNode = function(o) {
 Parser.prototype.push = function(data) {
   var c;
   while ((c = this._getc(data)) !== EOB) {
-    if (this._col === -1)
-      this._col = 0;
-    if (c === 10) {
-      this._line++;
-      this._col = -1;
-    } else if (c !== 13)
-      this._col++;
     if (this._incomment) {
       if (isNL(c) || c === EOF) {
         this._incomment = false;
@@ -173,7 +166,7 @@ Parser.prototype.push = function(data) {
         break;
     }
     if (c === EOF) {
-      console.error('got EOF, resetting ...');
+      //console.error('got EOF, resetting ...');
       this._reset();
       return this.emit('end');
     }
@@ -183,7 +176,7 @@ Parser.prototype.push = function(data) {
 
 Parser.prototype._bodyParse = function(c) {
   if (this._nodestate.state === BODYSTATE.READ_KEY) {
-//console.error('node state === READ_KEY');
+//console.error('node state === READ_KEY => c: ' + inspect(String.fromCharCode(c)));
     if (c === EOF || c === CLOSE_BRACE)
       this._throwError('Unexpected end of body node');
     else if (c === OPEN_BRACE) {
@@ -227,7 +220,7 @@ Parser.prototype._bodyParse = function(c) {
       return;
     }
   } else if (this._nodestate.state === BODYSTATE.READ_VAL) {
-//console.error('node state === READ_VAL');
+//console.error('node state === READ_VAL => c: ' + inspect(String.fromCharCode(c)));
     if (isWhitespace(c) && this._buffer === undefined)
       return;
     else if (c === OPEN_BRACKET || c === OPEN_PARENS) {
@@ -252,7 +245,7 @@ Parser.prototype._bodyParse = function(c) {
             this._nodestate.fields[tokens[1]] = { type: FIELD_TYPES[tokens[0]] };
           }
         } else
-          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._nodestate.val));
+          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._nodestate.val), this._getField().type);
         this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
@@ -284,7 +277,7 @@ Parser.prototype._bodyParse = function(c) {
           done = true;
         if (!done)
           this._throwError('Unexpected end of field');
-        this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
+        this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer), this._getField().type);
         this._ptr = 0;
         this._buffer = undefined;
         this._nodestate.key = this._nodestate.val = undefined;
@@ -320,7 +313,7 @@ Parser.prototype._bodyParse = function(c) {
             this._nodestate.val.push(this._buffer);
           } else {
             // single quoted field value
-            this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
+            this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer), this._getField().type);
             this._ptr = 0;
             this._nodestate.key = this._nodestate.val = undefined;
             this._nodestate.state = BODYSTATE.IDLE;
@@ -330,7 +323,7 @@ Parser.prototype._bodyParse = function(c) {
           return;
         }
       }
-    } else if (((c === COMMA && FIELD_TYPES[this._getField().type].substr(0,2) === 'MF') ||
+    } else if (((c === COMMA && ((this._getField() === undefined && this._nodestate.key === 'fields') || FIELD_TYPES[this._getField().type].substr(0,2) === 'MF')) ||
                 (c === PIPE && this._getField().type === FIELD_TYPES.SFBitMask)
                ) && Array.isArray(this._nodestate.val)) {
       if (this._nodestate.wasQuoted)
@@ -345,24 +338,51 @@ Parser.prototype._bodyParse = function(c) {
       if (!Array.isArray(this._nodestate.val)) {
         var field = this._getField(), done = false;
         if (field.type === FIELD_TYPES.SFColor || field.type === FIELD_TYPES.SFVec3f) {
-          if (++this._ptr === 3)
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 3) {
             done = true;
+            this._buffer = this._buffer.replace(/\r/g, ' ');
+          }
         } else if (field.type === FIELD_TYPES.SFVec2f) {
-          if (++this._ptr === 2)
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 2) {
+            this._buffer = this._buffer.replace(/\r/g, ' ');
             done = true;
+          }
         } else if (field.type === FIELD_TYPES.SFRotation) {
-          if (++this._ptr === 4)
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 4) {
+            this._buffer = this._buffer.replace(/\r/g, ' ');
             done = true;
+          }
         } else if (field.type === FIELD_TYPES.SFMatrix) {
-          if (++this._ptr === 16)
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 16) {
+            this._buffer = this._buffer.replace(/\r/g, ' ');
             done = true;
-        } else if (FIELD_TYPES[field.type].substr(0, 2) === 'MF') {
-          done = true;
-          this._buffer = [this._buffer];
+          }
+        } else if (field.type === FIELD_TYPES.MFColor || field.type === FIELD_TYPES.MFVec3f) {
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 3) {
+            done = true;
+            this._buffer = [this._buffer.replace(/\r/g, ' ')];
+          }
+        } else if (field.type === FIELD_TYPES.MFVec2f) {
+          if (isWhitespace(this._buffer.charCodeAt(this._buffer.length-1)))
+            return;
+          else if (++this._ptr === 2) {
+            done = true;
+            this._buffer = [this._buffer.replace(/\r/g, ' ')];
+          }
         } else
           done = true;
         if (done) {
-          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer));
+          this.emit('field', this._nodestate.key, formatValue(this._getField().type, this._buffer), this._getField().type);
           this._ptr = 0;
           this._buffer = undefined;
           this._nodestate.wasQuoted = false;
@@ -439,6 +459,13 @@ Parser.prototype._getc = function(data) {
         else // string
           c = data.charCodeAt(this._dataptr);
         this._dataptr++;
+        if (this._col === -1)
+          this._col = 0;
+        if (c === 10) {
+          this._line++;
+          this._col = -1;
+        } else if (c !== 13)
+          this._col++;
       }
     }
   }
@@ -491,7 +518,7 @@ function formatValue(type, val) {
     case FIELD_TYPES.SFFloat:
       return toFloat(val);
     case FIELD_TYPES.SFMatrix:
-      var vals = val.map(toFloat), ret = new Array(4);
+      var vals = toMultiFloat(val), ret = new Array(4);
       for (var i=0; i<4; ++i) {
         ret[i] = new Array(4);
         ret[i][0] = vals[i*4];

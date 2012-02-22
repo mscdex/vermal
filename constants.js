@@ -33,6 +33,8 @@ var TOKENS = {
   Switch: C++,
   WWWAnchor: C++,
   LOD: C++,
+  Group: C++, // deprecated, but some VRML scenes still use it
+  TransformSeparator: C++, // same story as Group
   // Misc nodes
   OrthographicCamera: C++,
   PerspectiveCamera: C++,
@@ -105,6 +107,7 @@ var FIELDS = {
     family: { type: FIELD_TYPES.SFEnum, default: 'SERIF', values: ['SERIF', 'SANS', 'TYPEWRITER'] },
     style: { type: FIELD_TYPES.SFBitMask, default: ['NONE'], values: ['NONE', 'BOLD', 'ITALIC'] }
   },
+  Group: {},
   IndexedFaceSet: {
     coordIndex: { type: FIELD_TYPES.MFLong, default: [0] },
     materialIndex: { type: FIELD_TYPES.MFLong, default: [-1] },
@@ -244,6 +247,7 @@ var FIELDS = {
     scaleOrientation: { type: FIELD_TYPES.SFRotation, default: [0, 0, 1, 0] },
     center: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 0] }
   },
+  TransformSeparator: {},
   Translation: {
     translation: { type: FIELD_TYPES.SFVec3f, default: [0, 0, 0] }
   },
